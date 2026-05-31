@@ -1,14 +1,32 @@
-import { MMKV } from 'react-native-mmkv';
+import { Platform } from 'react-native';
 import type { StateStorage } from 'zustand/middleware';
 
-const storage = new MMKV({ id: 'terminal-protocol' });
+// On web: use localStorage (synchronous, same API surface as MMKV).
+// On native: use MMKV via JSI for zero-latency persistence.
+function buildStorage(): StateStorage {
+  if (Platform.OS === 'web') {
+    return {
+      getItem: (name) => {
+        try { return localStorage.getItem(name); } catch { return null; }
+      },
+      setItem: (name, value) => {
+        try { localStorage.setItem(name, value); } catch { /* quota */ }
+      },
+      removeItem: (name) => {
+        try { localStorage.removeItem(name); } catch { /* noop */ }
+      },
+    };
+  }
 
-/**
- * Synchronous MMKV adapter for Zustand persist middleware.
- * MMKV reads/writes are O(1) on the JSI thread — no async bridge overhead.
- */
-export const mmkvStorage: StateStorage = {
-  getItem: (name: string): string | null => storage.getString(name) ?? null,
-  setItem: (name: string, value: string): void => storage.set(name, value),
-  removeItem: (name: string): void => storage.delete(name),
-};
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { MMKV } = require('react-native-mmkv') as typeof import('react-native-mmkv');
+  const storage = new MMKV({ id: 'terminal-protocol' });
+  return {
+    getItem: (name) => storage.getString(name) ?? null,
+    setItem: (name, value) => storage.set(name, value),
+    removeItem: (name) => storage.delete(name),
+  };
+}
+
+export const mmkvStorage: StateStorage = buildStorage();
+
