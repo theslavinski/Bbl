@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/terminal-protocol-architecture-CSF3f
+
+jobs:
+  build:
+    name: EAS Build — Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build APK
+        run: eas build --platform android --profile preview --non-interactive
+
+      - name: Get APK download URL
+        run: eas build:list --platform android --limit 1 --non-interactive --json | grep -o '"url":"[^"]*"' | head -1
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
