@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Terminal Protocol",
+    "slug": "terminal-protocol",
+    "version": "1.0.0",
+    "scheme": "terminal-protocol",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.terminalprotocol.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#050a05"
+      },
+      "package": "com.terminalprotocol.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

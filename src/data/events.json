@@ -1,0 +1,167 @@
+{
+  "events": [
+    {
+      "id": "boot_complete",
+      "title": "SYSTEM BOOT",
+      "description": "Emergency firmware loaded. Life support: NOMINAL. Hull integrity: DEGRADED. Crew status: UNKNOWN. Awaiting command.",
+      "trigger": { "kind": "manual" },
+      "choices": [
+        {
+          "id": "begin",
+          "text": "> INITIATE RECOVERY PROTOCOL",
+          "effects": { "oxygen": 10 },
+          "log": "Recovery protocol initiated. Oxygen scrubbers online."
+        }
+      ]
+    },
+    {
+      "id": "low_oxygen",
+      "title": "O2 CRITICAL",
+      "description": "Oxygen reserves below 20%. Crew consciousness compromised. Emergency options available.",
+      "trigger": { "kind": "resource", "resource": "oxygen", "threshold": 20, "condition": "below" },
+      "choices": [
+        {
+          "id": "reroute_power",
+          "text": "> REROUTE AUX POWER TO SCRUBBERS",
+          "effects": { "energy": -15, "oxygen": 25 },
+          "log": "Power rerouted. Oxygen scrubbers at 140% capacity."
+        },
+        {
+          "id": "vent_reserve",
+          "text": "> VENT EMERGENCY RESERVE TANK",
+          "effects": { "oxygen": 40, "hull": -8 },
+          "log": "Emergency tank vented. Hull stress detected."
+        }
+      ],
+      "repeatable": false
+    },
+    {
+      "id": "anomaly_signal",
+      "title": "ANOMALOUS SIGNAL",
+      "description": "Unknown transmission on emergency freq 121.5 MHz. Signal strength: STRONG. Origin: UNRESOLVED. Respond?",
+      "trigger": { "kind": "resource", "resource": "data", "threshold": 50, "condition": "above" },
+      "choices": [
+        {
+          "id": "respond",
+          "text": "> TRANSMIT IDENTIFICATION BURST",
+          "effects": { "data": -20 },
+          "unlocks": ["signal_response"],
+          "log": "ID burst transmitted on 121.5. Awaiting reply..."
+        },
+        {
+          "id": "ignore",
+          "text": "> MAINTAIN COMMS SILENCE",
+          "effects": { "hull": 5 },
+          "log": "Transmission logged. Passive monitoring active."
+        }
+      ],
+      "repeatable": false
+    },
+    {
+      "id": "signal_response",
+      "title": "RESPONSE RECEIVED",
+      "description": "'SECTOR 7 CLEAR. RENDEZVOUS COORD FOLLOW. AUTHENTICATE WITH REGISTRY CODE.' Registry code on file. Transmit?",
+      "trigger": { "kind": "manual" },
+      "choices": [
+        {
+          "id": "authenticate",
+          "text": "> TRANSMIT REGISTRY CODE",
+          "effects": { "data": 60 },
+          "log": "Auth accepted. Rendezvous coordinates received and stored."
+        },
+        {
+          "id": "spoof",
+          "text": "> TRANSMIT SPOOFED CODE",
+          "effects": { "data": 20, "energy": -10 },
+          "log": "Spoofed credentials accepted. Navigation updated."
+        }
+      ],
+      "repeatable": false
+    },
+    {
+      "id": "power_surge",
+      "title": "REACTOR OVERLOAD",
+      "description": "Reactor output exceeds nominal by 40%. Capacitors near saturation. Action required.",
+      "trigger": { "kind": "resource", "resource": "energy", "threshold": 90, "condition": "above" },
+      "choices": [
+        {
+          "id": "vent_energy",
+          "text": "> EMERGENCY VENT TO SPACE",
+          "effects": { "energy": -35 },
+          "log": "Excess plasma vented. Reactor nominal."
+        },
+        {
+          "id": "compress_to_data",
+          "text": "> COMPRESS INTO DATA CRYSTAL",
+          "effects": { "energy": -25, "data": 20 },
+          "log": "Energy crystallized. Data extraction: 20 units."
+        }
+      ],
+      "repeatable": true
+    },
+    {
+      "id": "hull_microcrack",
+      "title": "HULL BREACH IMMINENT",
+      "description": "Microfracture network expanding in Sections 3–4. Estimated 8 hours until structural failure. Options?",
+      "trigger": { "kind": "resource", "resource": "hull", "threshold": 35, "condition": "below" },
+      "choices": [
+        {
+          "id": "deploy_bots",
+          "text": "> DEPLOY REPAIR DRONES",
+          "effects": { "energy": -12, "data": -5, "hull": 22 },
+          "log": "Repair drones deployed. Microfractures sealed."
+        },
+        {
+          "id": "manual_weld",
+          "text": "> MANUAL EVA WELD",
+          "effects": { "oxygen": -15, "hull": 35 },
+          "log": "EVA team reports breach sealed. O2 consumption high."
+        }
+      ],
+      "repeatable": false
+    },
+    {
+      "id": "data_intelligence",
+      "title": "INTELLIGENCE FRAGMENT",
+      "description": "Data scan complete. Fragment recovered: pre-incident crew manifest. Decrypt?",
+      "trigger": { "kind": "resource", "resource": "data", "threshold": 80, "condition": "above" },
+      "choices": [
+        {
+          "id": "decrypt",
+          "text": "> DECRYPT FRAGMENT",
+          "effects": { "data": -30, "energy": -5 },
+          "log": "Decryption complete. 12 crew members listed as present at incident.",
+          "unlocks": ["crew_manifest"]
+        },
+        {
+          "id": "store_raw",
+          "text": "> STORE ENCRYPTED FOR LATER",
+          "effects": {},
+          "log": "Fragment archived. Encryption key preserved."
+        }
+      ],
+      "repeatable": false
+    },
+    {
+      "id": "crew_manifest",
+      "title": "CREW STATUS",
+      "description": "Manifest analysis: 3 survivors in cryo-stasis detected. Stasis pods consuming backup power. Sustain?",
+      "trigger": { "kind": "manual" },
+      "choices": [
+        {
+          "id": "sustain",
+          "text": "> SUSTAIN STASIS — DIVERT POWER",
+          "effects": { "energy": -20, "oxygen": 15 },
+          "log": "Stasis pods online. Three lives maintained at cost of 20 energy."
+        },
+        {
+          "id": "revive",
+          "text": "> EMERGENCY REVIVAL SEQUENCE",
+          "effects": { "oxygen": -20, "energy": -15, "hull": 10 },
+          "log": "Revival initiated. Survivors conscious. Hull repair assistance available."
+        }
+      ],
+      "repeatable": false
+    }
+  ]
+}
