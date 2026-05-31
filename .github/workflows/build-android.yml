@@ -10,6 +10,8 @@ jobs:
   build:
     name: EAS Build — Android APK
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +34,9 @@ jobs:
       - name: Build APK
         run: eas build --platform android --profile preview --non-interactive
 
-      - name: Get APK download URL
-        run: eas build:list --platform android --limit 1 --non-interactive --json | grep -o '"url":"[^"]*"' | head -1
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Print download URL
+        run: |
+          echo "✅ Build complete. Download your APK from:"
+          eas build:list --platform android --limit 1 --non-interactive --json 2>/dev/null \
+            | python3 -c "import sys,json; builds=json.load(sys.stdin); print(builds[0]['artifacts']['buildUrl'] if builds else 'Check expo.dev/builds')" \
+            || echo "→ https://expo.dev/accounts/[your-username]/projects/terminal-protocol/builds"
